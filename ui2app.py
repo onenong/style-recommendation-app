@@ -31,7 +31,7 @@ with st.container():
     with col1:
         gender = st.radio("성별 선택", ["남성", "여성"])
     with col2:
-        season = st.radio("상황 선택", ["미팅", "울근", "잡상"])
+        season = st.radio("상황 선택", ["미팅", "출근", "캐주얼"])
     st.button("추천 스타일 받기")
 
 st.markdown("---")
