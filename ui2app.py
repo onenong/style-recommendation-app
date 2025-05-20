@@ -28,42 +28,42 @@ with st.container():
 
 st.markdown("---")
 
-# 3단계: 상황/계절 선택
+# 3단계: 상황/계절 선택 (항상 표시)
+with st.container():
+    st.subheader("🌦️ 3단계: 상황/계절 선택")
+    col1, col2 = st.columns(2)
+    with col1:
+        gender = st.radio("성별 선택", ["남성", "여성"])
+    with col2:
+        season = st.radio("상황 선택", ["미팅", "출근", "캐주얼"])
+    get_recommendation = st.button("추천 스타일 받기")
+
+st.markdown("---")
+
+# 4단계: 추천 스타일
+if get_recommendation:
     with st.container():
-        st.subheader("🌦️ 3단계: 상황/계절 선택")
-        col1, col2 = st.columns(2)
-        with col1:
-            gender = st.radio("성별 선택", ["남성", "여성"])
-        with col2:
-            season = st.radio("상황 선택", ["미팅", "출근", "캐주얼"])
-        get_recommendation = st.button("추천 스타일 받기")
+        st.subheader("🎯 4단계: 추천 스타일")
+
+        # 검색 키워드 생성
+        search_query = f"{selected_item} {color} {gender} {season} 스타일 site:pinterest.com"
+
+        def get_pinterest_images(query, max_images=3):
+            headers = {"User-Agent": "Mozilla/5.0"}
+            res = requests.get(f"https://www.google.com/search?q={query}&tbm=isch", headers=headers)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            img_tags = soup.find_all("img")
+            image_urls = [img["src"] for img in img_tags if "src" in img.attrs]
+            return image_urls[1:max_images+1]  # 첫 번째는 로고일 수 있음
+
+        image_urls = get_pinterest_images(search_query)
+
+        for i, url in enumerate(image_urls):
+            st.image(url, caption=f"코디 {i+1}", width=200)
+
+        st.markdown(f"[🔍 Pinterest에서 '{search_query}' 검색하기](https://www.pinterest.com/search/pins/?q={search_query.replace(' ', '%20')})")
 
     st.markdown("---")
-
-    # 4단계: 추천 스타일
-    if get_recommendation:
-        with st.container():
-            st.subheader("🎯 4단계: 추천 스타일")
-
-            # 검색 키워드 생성
-            search_query = f"{selected_item} {color} {gender} {season} 스타일 site:pinterest.com"
-
-            def get_pinterest_images(query, max_images=3):
-                headers = {"User-Agent": "Mozilla/5.0"}
-                res = requests.get(f"https://www.google.com/search?q={query}&tbm=isch", headers=headers)
-                soup = BeautifulSoup(res.text, 'html.parser')
-                img_tags = soup.find_all("img")
-                image_urls = [img["src"] for img in img_tags if "src" in img.attrs]
-                return image_urls[1:max_images+1]  # 첫 번째는 로고일 수 있으니 제외
-
-            image_urls = get_pinterest_images(search_query)
-
-            for i, url in enumerate(image_urls):
-                st.image(url, caption=f"코디 {i+1}", width=200)
-
-            st.button("Pinterest에서 더 보기", on_click=lambda: st.markdown(f"[Pinterest 검색 링크](https://www.pinterest.com/search/pins/?q={search_query.replace(' ', '%20')})"))
-
-        st.markdown("---")
 
 # 5단계: 결과 저장/공유
 with st.container():
@@ -72,6 +72,8 @@ with st.container():
 - 옷종류: {selected_item}
 - 색상: {color}
 - 소재: {material}
+- 성별: {gender}
+- 상황: {season}
 """
     st.download_button("결과 저장하기", result_text, file_name="style_result.txt")
     st.button("공유하기")
