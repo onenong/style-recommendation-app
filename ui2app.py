@@ -29,7 +29,6 @@ with st.container():
 st.markdown("---")
 
 # 3단계: 상황/계절 선택
-if show_season_options:
     with st.container():
         st.subheader("🌦️ 3단계: 상황/계절 선택")
         col1, col2 = st.columns(2)
