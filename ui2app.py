@@ -1,6 +1,4 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
 
 st.set_page_config(page_title="AI 스타일 추천기", layout="wide")
 st.markdown("## 👗 AI 스타일 추천기")
