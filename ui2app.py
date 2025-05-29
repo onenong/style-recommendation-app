@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 모델 불러오기
-model = tf.keras.models.load_model("converted_keras_model/keras_model.h5")
+model = tf.keras.models.load_model("converted_keras_model/saved_model")
 with open("converted_keras_model/labels.txt", "r") as f:
     labels = [line.strip() for line in f.readlines()]
 
