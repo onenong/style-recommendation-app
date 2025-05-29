@@ -5,13 +5,17 @@ import tensorflow as tf
 import requests
 from bs4 import BeautifulSoup
 
-# 모델 불러오기
-model = tf.keras.models.load_model("converted_keras_model/saved_model")
-with open("converted_keras_model/labels.txt", "r") as f:
-    labels = [line.strip() for line in f.readlines()]
-
 st.set_page_config(page_title="AI 스타일 추천기", layout="wide")
 st.markdown("## 👗 AI 스타일 추천기")
+
+# 🔧 모델 로드
+try:
+    model = tf.keras.models.load_model("converted_keras_model/saved_model")
+    with open("converted_keras_model/labels.txt", "r") as f:
+        labels = [line.strip() for line in f.readlines()]
+except Exception as e:
+    st.error(f"❌ 모델 로딩 실패: {e}")
+    st.stop()
 
 # 1단계: 이미지 업로드
 with st.container():
