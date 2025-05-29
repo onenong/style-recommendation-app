@@ -1,0 +1,6 @@
+streamlit
+tensorflow
+pillow
+beautifulsoup4
+requests
+opencv-python
