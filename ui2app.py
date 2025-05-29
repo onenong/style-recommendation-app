@@ -2,20 +2,19 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import tensorflow as tf
+from keras.layers import TFSMLayer
 import requests
 from bs4 import BeautifulSoup
 
+# 모델 불러오기 (Keras 3 대응)
+model = TFSMLayer("converted_keras_model/saved_model", call_endpoint="serving_default")
+
+# 레이블 불러오기
+with open("converted_keras_model/labels.txt", "r") as f:
+    labels = [line.strip() for line in f.readlines()]
+
 st.set_page_config(page_title="AI 스타일 추천기", layout="wide")
 st.markdown("## 👗 AI 스타일 추천기")
-
-# 🔧 모델 로드
-try:
-    model = tf.keras.models.load_model("converted_keras_model/saved_model")
-    with open("converted_keras_model/labels.txt", "r") as f:
-        labels = [line.strip() for line in f.readlines()]
-except Exception as e:
-    st.error(f"❌ 모델 로딩 실패: {e}")
-    st.stop()
 
 # 1단계: 이미지 업로드
 with st.container():
@@ -26,11 +25,11 @@ with st.container():
     with col2:
         selected_item = st.selectbox("의류 카테고리 선택", ["코트", "자켓", "티셔츠", "팬츠", "기타"])
 
-# 초기값 설정
+# 초기값
 predicted_color = "분석 중..."
 material = "예: 울, 면 등 (기능 추가 예정)"
 
-# 2단계: 색상 분석 (이미지 업로드되었을 때)
+# 2단계: 색상 분석
 if uploaded_image is not None:
     st.image(uploaded_image, caption="업로드한 이미지", use_column_width=True)
 
@@ -39,7 +38,7 @@ if uploaded_image is not None:
     image_array = np.asarray(image, dtype=np.float32) / 255.0
     image_array = np.expand_dims(image_array, axis=0)
 
-    prediction = model.predict(image_array)
+    prediction = model(image_array, training=False).numpy()
     predicted_index = np.argmax(prediction)
     predicted_color = labels[predicted_index].replace(" ", "").replace("_", "")
 
@@ -69,7 +68,6 @@ with st.container():
 if get_recommendation and uploaded_image is not None:
     st.subheader("🎯 4단계: 추천 스타일")
 
-    # 검색 키워드 생성
     search_query = f"{predicted_color} {selected_item} {gender} {season} 스타일 site:pinterest.com"
 
     def get_pinterest_images(query, max_images=3):
